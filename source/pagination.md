@@ -195,28 +195,30 @@ const CommentsWithData = graphql(CommentsQuery, {
   // meaning our loadMoreEntries function will always have the right cursor
   props({ data: { loading, comments, fetchMore } }) {
     return {
-      loading,
-      comments,
-      loadMoreEntries: () => {
-        return fetchMore({
-          query: CommentsQuery,
-          variables: {
-            cursor: comments.pageInfo.endCursor,
-          },
-          updateQuery: (previousResult, { fetchMoreResult }) => {
-            const newEdges = fetchMoreResult.data.comments.edges;
-            const pageInfo = fetchMoreResult.data.comments.pageInfo;
+      data: {
+        loading,
+        comments,
+        loadMoreEntries: () => {
+          return fetchMore({
+            query: CommentsQuery,
+            variables: {
+              cursor: comments.pageInfo.endCursor,
+            },
+            updateQuery: (previousResult, { fetchMoreResult }) => {
+              const newEdges = fetchMoreResult.data.comments.edges;
+              const pageInfo = fetchMoreResult.data.comments.pageInfo;
 
-            return {
-              // Put the new comments at the end of the list and update `pageInfo`
-              // so we have the new `endCursor` and `hasNextPage` values
-              comments: {
-                edges: [...previousResult.comments.edges, ...newEdges],
-                pageInfo,
-              },
-            };
-          },
-        });
+              return {
+                // Put the new comments at the end of the list and update `pageInfo`
+                // so we have the new `endCursor` and `hasNextPage` values
+                comments: {
+                  edges: [...previousResult.comments.edges, ...newEdges],
+                  pageInfo,
+                },
+              };
+            },
+          });
+        },
       },
     };
   },
